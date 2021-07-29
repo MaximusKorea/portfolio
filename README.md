@@ -26,7 +26,7 @@ CGV 영화예매사이트 포트폴리오
 <개발 파트>
 - 기여한 부분 : 메인 화면 일부, 로그인, 회원가입, 아이디 찾기, 비밀번호 찾기
 
--Main-
+-Main 화면-
 
 ![image](https://user-images.githubusercontent.com/78652436/127478820-4ba8530d-4096-4bb1-a242-3d21f5fbb833.png)
 
