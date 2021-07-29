@@ -65,14 +65,17 @@ CGV 영화예매사이트 포트폴리오
 
 --로그인--
 
-![image](https://user-images.githubusercontent.com/78652436/127480417-d975776b-9855-4f71-af7f-c3a7382744e9.png)
+![image](https://user-images.githubusercontent.com/78652436/127482024-aea7c39d-8af3-4c0d-a10c-e4d72e6059bb.png)
+
 
 1. 로그인 필수 입력 체크
 2. 자동 로그인 방지
 3. 카카오계정 로그인
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-![image](https://user-images.githubusercontent.com/78652436/127480610-f9ec4132-1600-4a58-b0da-3aae2599cb93.png)
+
+![image](https://user-images.githubusercontent.com/78652436/127482085-f2eb9604-ca5d-41f5-b6d3-3266b5355b7f.png)
+
 
 1. 카카오계정으로 로그인
 2. 회원가입 없이 사이트 로그인 가능
