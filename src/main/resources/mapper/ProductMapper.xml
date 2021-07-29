@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.product.mapper.ProductMapper">
+	
+	<select id="ProductselectByNo" parameterType="java.lang.Integer" resultType="domain.product.Product">
+	 	SELECT *
+	 	FROM PRODUCT
+	 	WHERE p_no =#{p_no} order by p_price desc
+	</select>
+	
+	<select id="ProductselectByType" parameterType="java.lang.Integer" resultType="domain.product.Product">
+	 	SELECT *
+	 	FROM PRODUCT
+	 	WHERE p_type =#{p_type}
+	</select>
+ 	
+	 <select id="ProductselectAll" parameterType="pagebean.ListResultBeanProduct" resultType="domain.product.Product">
+	 	<![CDATA[	
+			select * from 
+			  	(select rownum idx, p.* from 
+					(select *
+					from product  
+					order by p_no desc) p
+			  	)
+			where idx>=#{startRowNum} and idx<=#{endRowNum}
+		]]>
+	 </select>
+	 
+	 <select id="readCountProduct" parameterType="int" resultType="int">
+		select count(*) count from product order by p_no desc
+	 </select>
+	 
+	 <insert id="insertProduct" parameterType="domain.product.Product">
+		<selectKey keyProperty="p_no" resultType="int" order="BEFORE">
+			SELECT product_no_seq.nextval FROM DUAL
+	 	</selectKey>
+	 	INSERT INTO PRODUCT(p_no,p_name,p_image,p_price,p_content,p_desc,p_type)
+	 	VALUES
+	 	(#{p_no},#{p_name},#{p_image},#{p_price},#{p_content},#{p_desc},#{p_type})	
+	 </insert>
+ 		
+ 	 <delete id="deleteProduct" parameterType="java.lang.Integer">
+ 	 	DELETE FROM PRODUCT
+ 	 	WHERE p_no =#{p_no}
+ 	 </delete>
+	 
+	 <update id="updateProduct" parameterType="domain.product.Product">
+	 	UPDATE PRODUCT
+	 	SET 
+	 	p_name =#{p_name},
+	 	p_image =#{p_image},
+	 	p_price =#{p_price},
+	 	p_content =#{p_content},
+	 	p_desc =#{p_desc},
+	 	p_type =#{p_type}
+	 	WHERE p_no =#{p_no}
+	 </update>
+	 
+</mapper>

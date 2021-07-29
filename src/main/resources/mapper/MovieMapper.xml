@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.movie.mapper.MovieMapper">
+
+	<insert id="createMovie" parameterType="domain.movie.Movie">
+		<selectKey keyProperty="mv_no" resultType="int" order="BEFORE">
+			SELECT MOVIE_MV_NO_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		insert into movie(mv_no,mv_state,mv_reserveRate,mv_name,mv_director,mv_actor,mv_runTime,mv_info,mv_date,mv_age,mv_image,mv_trailer,mv_genre)
+		values
+		(#{mv_no},#{mv_state},#{mv_reserveRate},#{mv_name},#{mv_director},#{mv_actor},#{mv_runTime},#{mv_info},#{mv_date},#{mv_age},#{mv_image},#{mv_trailer},#{mv_genre})
+	</insert>
+	
+	<insert id="createMovieRental" parameterType="domain.movie.MovieRental">
+		<selectKey keyProperty="mv_rt_no" resultType="int" order="BEFORE">
+			SELECT MOVIE_MV_RT_NO_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		insert into movie_rental(mv_rt_no,mv_rt_state,mv_rt_reserveRate,mv_rt_name,mv_rt_director,mv_rt_actor,mv_rt_runTime,mv_rt_info,mv_rt_date,mv_rt_age,mv_rt_image,mv_rt_trailer,mv_rt_genre)
+		values
+		(#{mv_rt_no},#{mv_rt_state},#{mv_rt_reserveRate},#{mv_rt_name},#{mv_rt_director},#{mv_rt_actor},#{mv_rt_runTime},#{mv_rt_info},#{mv_rt_date},#{mv_rt_age},#{mv_rt_image},#{mv_rt_trailer},#{mv_rt_genre})
+	</insert>
+
+	<update id="updateMovie" parameterType="domain.movie.Movie">
+		update movie
+		set
+		mv_state =#{mv_state},
+		mv_reserveRate =#{mv_reserveRate},
+		mv_name =#{mv_name},
+		mv_director =#{mv_director},
+		mv_actor =#{mv_actor},
+		mv_runTime =#{mv_runTime},
+		mv_info =#{mv_info},
+		mv_date =#{mv_date},
+		mv_age =#{mv_age},
+		mv_image =#{mv_image},
+		mv_trailer =#{mv_trailer},
+		mv_genre =#{mv_genre}
+		where mv_no =#{mv_no}
+	</update>
+	
+	<update id="updateRentalMovie" parameterType="domain.movie.MovieRental">
+		update movie_rental
+		set
+		mv_rt_state =#{mv_rt_state},
+		mv_rt_reserveRate =#{mv_rt_reserveRate},
+		mv_rt_name =#{mv_rt_name},
+		mv_rt_director =#{mv_rt_director},
+		mv_rt_actor =#{mv_rt_actor},
+		mv_rt_runTime =#{mv_rt_runTime},
+		mv_rt_info =#{mv_rt_info},
+		mv_rt_date =#{mv_rt_date},
+		mv_rt_age =#{mv_rt_age},
+		mv_rt_image =#{mv_rt_image},
+		mv_rt_trailer =#{mv_rt_trailer},
+		mv_rt_genre =#{mv_rt_genre}
+		where mv_rt_no =#{mv_rt_no}
+	</update>		
+	
+	 <delete id="deleteMovie" parameterType="java.lang.Integer">
+ 	 	DELETE FROM MOVIE
+ 	 	WHERE MV_NO =#{MV_NO}
+ 	 </delete>
+ 	 
+ 	 <delete id="deleteRentalMovie" parameterType="java.lang.Integer">
+ 	 	DELETE FROM MOVIE_RENTAL
+ 	 	WHERE MV_RT_NO =#{MV_RT_NO}
+ 	 </delete>
+	
+	<select id="readByNoMovie" parameterType="java.lang.Integer" resultType="domain.movie.Movie">
+	 	SELECT *
+	 	FROM MOVIE
+	 	WHERE MV_NO =#{MV_NO}
+	</select>
+	
+	<select id="readRentalByNoMovie" parameterType="java.lang.Integer" resultType="domain.movie.MovieRental">
+	 	SELECT *
+	 	FROM MOVIE_RENTAL
+	 	WHERE MV_RT_NO =#{MV_RT_NO}
+	</select>
+	
+	<select id="readByNameMovie" parameterType="java.lang.String" resultType="domain.movie.Movie">
+	 	SELECT *
+	 	FROM MOVIE
+	 	WHERE MV_NAME =#{MV_NAME}
+	</select>
+	
+	<select id="readAllMovie" parameterType="pagebean.ListResultBeanBasic" resultType="domain.movie.Movie">
+		<![CDATA[
+			select * from (
+				select rownum idx, m.* from 
+					(select *
+					from movie
+					order by mv_reserverate desc, mv_no asc
+					) m
+			) where idx>=#{startRowNum} and idx<=#{endRowNum}
+		]]>
+	 </select>
+	 
+	 <select id="readFinderAllMovie" parameterType="pagebean.ListResultBeanBasicFinder" resultType="domain.movie.MovieFinder">
+		<![CDATA[
+			select * from (
+				select rownum idx, m.* from 
+					(select *
+					from movie
+					order by mv_reserverate desc, mv_no asc
+					) m
+			) where idx>=#{startRowNum} and idx<=#{endRowNum}
+		]]>
+			<!-- 영화검색 목록 -->
+			<if test='kt == "0"'><![CDATA[ AND mv_name like '%'||#{searchtxt}||'%' OR mv_director like '%'||#{searchtxt}||'%' OR mv_actor like '%'||#{searchtxt}||'%' ]]></if>
+			<if test='kt == "1"'><![CDATA[ AND mv_name like '%'||#{searchtxt}||'%' ]]></if>
+			<if test='kt == "2"'><![CDATA[ AND mv_actor like '%'||#{searchtxt}||'%' ]]></if>
+			<if test='kt == "3"'><![CDATA[ AND mv_director like '%'||#{searchtxt}||'%' ]]></if>
+			
+			<!-- 아트하우스 -->
+			<if test='indi == "true"'><![CDATA[ AND mv_genre like '%'||'아트하우스'||'%' ]]></if>
+			
+			<!-- 장르 -->
+			<if test='genre == "226"'><![CDATA[ AND mv_genre like '%'||'가족'||'%' ]]></if>
+			<if test='genre == "217"'><![CDATA[ AND mv_genre like '%'||'공포'||'%' OR mv_genre like '%'||'호러'||'%' ]]></if>
+			<if test='genre == "723"'><![CDATA[ AND mv_genre like '%'||'드라마'||'%' ]]></if>
+			<if test='genre == "721"'><![CDATA[ AND mv_genre like '%'||'SF'||'%' ]]></if>
+			<if test='genre == "1228"'><![CDATA[ AND mv_genre like '%'||'멜로'||'%' OR mv_genre like '%'||'로맨스'||'%' ]]></if>
+			<if test='genre == "732"'><![CDATA[ AND mv_genre like '%'||'코미디'||'%' ]]></if>
+			<if test='genre == "727"'><![CDATA[ AND mv_genre like '%'||'애니메이션'||'%' ]]></if>
+			<if test='genre == "228"'><![CDATA[ AND mv_genre like '%'||'느와르'||'%' ]]></if>
+			<if test='genre == "223"'><![CDATA[ AND mv_genre like '%'||'단편'||'%' ]]></if>
+			<if test='genre == "722"'><![CDATA[ AND mv_genre like '%'||'다큐멘터리'||'%' ]]></if>
+			<if test='genre == "1883"'><![CDATA[ AND mv_genre like '%'||'로드무비'||'%' ]]></if>
+			<if test='genre == "724"'><![CDATA[ AND mv_genre like '%'||'무협'||'%' ]]></if>
+			<if test='genre == "218"'><![CDATA[ AND mv_genre like '%'||'뮤지컬'||'%' ]]></if>
+			<if test='genre == "1884"'><![CDATA[ AND mv_genre like '%'||'뮤직'||'%' ]]></if>
+			<if test='genre == "219"'><![CDATA[ AND mv_genre like '%'||'미스터리'||'%' ]]></if>
+			<if test='genre == "222"'><![CDATA[ AND mv_genre like '%'||'범죄'||'%' ]]></if>
+			<if test='genre == "1885"'><![CDATA[ AND mv_genre like '%'||'옴니버스'||'%' ]]></if>
+			<if test='genre == "1886"'><![CDATA[ AND mv_genre like '%'||'서부'||'%' ]]></if>
+			<if test='genre == "725"'><![CDATA[ AND mv_genre like '%'||'스릴러'||'%' ]]></if>
+			<if test='genre == "1887"'><![CDATA[ AND mv_genre like '%'||'스포츠'||'%' ]]></if>
+			<if test='genre == "726"'><![CDATA[ AND mv_genre like '%'||'시대극'||'%' OR mv_genre like '%'||'사극'||'%' ]]></if>
+			<if test='genre == "225"'><![CDATA[ AND mv_genre like '%'||'아동'||'%' ]]></if>
+			<if test='genre == "224"'><![CDATA[ AND mv_genre like '%'||'액션'||'%' ]]></if>
+			<if test='genre == "728"'><![CDATA[ AND mv_genre like '%'||'어드벤처'||'%' ]]></if>
+			<if test='genre == "1888"'><![CDATA[ AND mv_genre like '%'||'역사'||'%' ]]></if>
+			<if test='genre == "1889"'><![CDATA[ AND mv_genre like '%'||'전기'||'%' ]]></if>
+			<if test='genre == "731"'><![CDATA[ AND mv_genre like '%'||'전쟁'||'%' ]]></if>
+			<if test='genre == "1890"'><![CDATA[ AND mv_genre like '%'||'종교'||'%' ]]></if>
+			<if test='genre == "1891"'><![CDATA[ AND mv_genre like '%'||'재난'||'%' ]]></if>
+			<if test='genre == "1892"'><![CDATA[ AND mv_genre like '%'||'청춘영화'||'%' ]]></if>
+			<if test='genre == "1893"'><![CDATA[ AND mv_genre like '%'||'퀴어'||'%' ]]></if>
+			<if test='genre == "227"'><![CDATA[ AND mv_genre like '%'||'환타지'||'%' ]]></if>
+			<if test='genre == "1894"'><![CDATA[ AND mv_genre like '%'||'학원물'||'%' ]]></if>
+			<if test='genre == "729"'><![CDATA[ AND mv_genre like '%'||'에로'||'%' ]]></if>
+			<if test='genre == "1895"'><![CDATA[ AND mv_genre like '%'||'없음'||'%' ]]></if>
+			
+			<!-- 제작국가 -->
+			<if test='national == "164"'><![CDATA[ AND mv_state = '한국' ]]></if>
+			<if test='national == "102"'><![CDATA[ AND mv_state = '미국' ]]></if>
+			<if test='national == "141"'><![CDATA[ AND mv_state = '일본' ]]></if>
+			<if test='national == "143"'><![CDATA[ AND mv_state = '중국' ]]></if>
+			<if test='national == "167"'><![CDATA[ AND mv_state = '홍콩' ]]></if>
+			<if test='national == "161"'><![CDATA[ AND mv_state = '프랑스' ]]></if>
+			<if test='national == "128"'><![CDATA[ AND mv_state = '영국' ]]></if>
+			<if test='national == "93"'><![CDATA[ AND mv_state = '독일' ]]></if>
+			<if test='national == "139"'><![CDATA[ AND mv_state = '인도' ]]></if>
+			<if test='national == "1000"'><![CDATA[ AND mv_state = '기타' ]]></if>
+			
+			<!-- 관람등급 -->
+			<if test='grade == "233"'><![CDATA[ AND mv_age = '전체' ]]></if>
+			<if test='grade == "230"'><![CDATA[ AND mv_age = '12세' ]]></if>
+			<if test='grade == "231"'><![CDATA[ AND mv_age = '15세' ]]></if>
+			<if test='grade == "232"'><![CDATA[ AND mv_age = '19세' ]]></if>
+			
+			<!-- 제작년도 -->
+			<![CDATA[ AND TO_CHAR(mv_date, 'YYYY') BETWEEN #{sdate} AND #{edate} ]]>
+	 </select> 
+	 
+	<select id="readRentalAllMovie" parameterType="pagebean.ListResultBeanBasicRental" resultType="domain.movie.MovieRental">
+		<![CDATA[
+			select * from (
+				select rownum idx, m.* from 
+					(select *
+					from movie_rental
+					order by mv_rt_reserverate desc, mv_rt_no asc
+					) m
+			) where idx>=#{startRowNum} and idx<=#{endRowNum}
+		]]>
+	</select> 
+	 
+	<select id="movieCount" resultType="int">
+		select count(*) count from movie order by mv_reserverate desc
+	</select>
+	
+	<select id="movieRentalCount" resultType="int">
+		select count(*) count from movie_rental order by mv_rt_reserverate desc
+	</select>
+	
+</mapper>

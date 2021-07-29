@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.product.mapper.ProductOrderMapper">
+
+	<select id="selectallOrder" resultType="domain.product.ProductJoinResult" parameterType="java.lang.Integer">
+		select p_name,p_image,p_price,po.po_count,po.po_date,po.po_no
+		from PRODUCTORDER po
+		left outer join PRODUCT p on po.P_NO = p.P_NO
+		left outer join MEMBER m on po.M_NO = m.M_NO
+		where m.m_no =#{m_no}
+	</select>
+	
+	<insert id="insertOrder" parameterType="domain.product.ProductOrder">
+		<selectKey keyProperty="po_no" resultType="int" order="BEFORE">
+			SELECT product_po_no_seq.nextval from dual
+		</selectKey>
+		insert into productorder(po_no,po_count,po_date,m_no,p_no,p_tot)
+		values 
+		(#{po_no},#{po_count},sysdate,#{m_no},#{p_no},#{p_tot})
+	</insert>
+	
+	<delete id="deleteOrder" parameterType="java.lang.Integer">
+		delete from productorder
+		where po_no=#{po_no}
+	</delete>
+	
+	<update id="updateOrder" parameterType="domain.product.ProductOrder">
+		update productorder 
+		set 
+		po_count =#{po_count},
+		po_date =#{po_date},
+		m_no =#{m_no},
+		p_no =#{p_no}
+		where po_no =#{po_no}
+	</update>
+	
+	<update id="updateOrderCountAndTot" parameterType="domain.product.ProductOrder">
+		update productorder 
+		set 
+		po_count =#{po_count},
+		p_tot =#{p_tot}
+		where po_no =#{po_no}
+	</update>
+	
+</mapper>	

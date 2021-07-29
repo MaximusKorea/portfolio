@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="mapper.ReviewMapper">
+
+	<insert id="insertReview" parameterType="domain.review.Review">
+		<selectKey keyProperty="rev_no" resultType="int" order="BEFORE">
+			select review_rev_no_seq.nextval from dual
+		</selectKey>		
+		insert into review(rev_no,rev_title,rev_content,rev_date,rev_rating,rev_count,mv_no,m_no)
+		values(#{rev_no},#{rev_title},#{rev_content},SYSDATE,#{rev_rating},#{rev_count},#{mv_no},#{m_no})
+	</insert>
+	    
+    <select id='selectListAll' parameterType="java.lang.Integer" resultType="domain.review.Review">
+	    select mv_image,rev_no,rev_title,rev_content,rev_date,rev_rating,rev_count,m_id
+		from movie mv, review r, member m
+		where r.mv_no = mv.mv_no
+		and m.m_no = r.m_no
+		order by rev_no
+    </select>
+    
+    <select id='selectDetail' parameterType="java.lang.Integer" resultType="domain.review.Review">
+	    select mv_image,m_id,rev_no,rev_title,rev_content,rev_date,rev_rating,rev_count
+		from movie mv, review r, member m
+		where mv.mv_no = r.mv_no
+		and m.m_no = r.m_no
+		and r.rev_no = #{rev_no}
+    </select>
+    	
+	<select id='selectByMvNo' parameterType="java.lang.Integer" resultType="domain.review.Review">
+		select rev_no,rev_title,rev_content,rev_date,rev_rating,rev_count,mv_no,m_no
+		from review r
+        where r.mv_no=#{mv_no}
+        order by rev_no
+	</select>	
+	
+	<update id="update" parameterType="domain.review.Review">
+		update review
+		set	
+			rev_title=#{rev_title},
+			rev_content=#{rev_content},
+			rev_rating=#{rev_rating}
+		where rev_no=#{rev_no}
+	</update>
+			
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from review
+		where rev_no=#{rev_no}
+	</delete>
+	
+</mapper>

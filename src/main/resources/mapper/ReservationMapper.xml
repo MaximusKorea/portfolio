@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.reservation.mapper.ReservationMapper">
+
+	<insert id="createReserv" parameterType="domain.reservation.Reservation">
+		<selectKey keyProperty="r_no" resultType="int" order="BEFORE">
+			SELECT Reservation_r_no_SEQ.nextval FROM DUAL
+		</selectKey>
+		INSERT INTO RESERVATION
+		VALUES
+		(#{r_no},
+		#{r_theater},
+		#{r_viewDate},
+		#{r_time},
+		#{r_price},
+		#{r_persons},
+		#{r_seat},
+		#{r_age},
+		#{m_no},
+		#{mv_no})
+	</insert>
+
+	<select id="selectAllReserv" resultType="domain.reservation.Reservation">
+		SELECT r.r_no, r.r_theater, r.R_VIEWDATE, r.r_time, r.r_price, r.r_persons, r.r_seat, r.r_age, r.m_no, mv.mv_name
+		FROM RESERVATION r
+		NATURAL JOIN MOVIE mv
+		ORDER BY r_viewdate, r_time
+	</select>
+
+	<select id="selectReserv" parameterType="int" resultType="domain.reservation.Reservation">
+		SELECT * FROM RESERVATION where r_no = #{r_no}
+	</select>
+
+	<select id="selectReserv_with_m_no" parameterType="int" resultType="domain.reservation.Reservation">
+		SELECT r.r_no, r.r_theater, r.R_VIEWDATE, r.r_time, r.r_price, r.r_persons, r.r_seat, r.r_age, r.m_no, mv.mv_name
+		FROM RESERVATION r
+		NATURAL JOIN MOVIE mv
+		where m_no = #{m_no}
+		ORDER BY r_viewdate, r_time
+	</select>
+
+	<select id="selectReserv_withDate" parameterType="java.util.Map" resultType="domain.reservation.Reservation"> 
+		SELECT r.r_no, r.r_theater, r.R_VIEWDATE, r.r_time, r.r_price, r.r_persons, r.r_seat, r.r_age, r.m_no, mv.mv_name
+		FROM RESERVATION r
+		NATURAL JOIN MOVIE mv
+		where m_no = #{m_no}
+		and r_viewdate = #{r_viewDate}
+	</select>
+		
+	<select id="checkSeat" parameterType="java.util.Map" resultType="int">
+		select count(*) cnt
+		from reservation
+		where r_theater = #{r_theater}
+		and r_viewDate = #{r_viewDate}
+		and r_time=#{r_time}
+		and r_seat like #{r_seat}
+		and mv_no = #{mv_no}
+	</select>
+
+	<select id="reservedSeat" parameterType="java.util.Map" resultType="java.lang.String">
+		select r_seat from reservation where mv_no=#{mv_no} and r_theater=#{r_theater} and r_viewdate=#{r_viewdate} and r_time=#{r_time}
+	</select>
+
+	<select id="cancelAvailable" parameterType="int" resultType="int">
+		select COUNT(*) cnt from reservation where r_no = #{r_no} and r_viewdate > sysdate
+	</select>
+
+	<delete id="deleteResev" parameterType="int">
+		DELETE FROM RESERVATION
+		where r_no = #{r_no}
+		and r_viewDate > sysdate
+	</delete>
+
+	<delete id="deleteResev_m_no" parameterType="int">
+		DELETE FROM RESERVATION
+		where m_no = #{m_no}
+	</delete>
+
+	<update id="updateReservRate" parameterType="int">
+		update movie set
+		MV_RESERVERATE = (
+							select LPAD(round((m.cnt/w.cnt)*100, 0),2,0)
+							from
+								(select count(*) cnt from reservation where mv_no = #{mv_no}) m,
+								(select count(*) cnt from reservation) w
+						 )
+		where mv_no=#{mv_no}
+	</update>
+	
+	<select id="getMvnoList" resultType="Integer">
+		select mv_no from movie
+	</select>
+	
+</mapper>

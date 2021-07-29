@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.point.mapper.PointMapper">
+
+	<insert id="createPoint" parameterType="domain.point.Point">
+		<selectKey keyProperty="pt_no" resultType="int" order="BEFORE">
+			SELECT POINT_NO_SEQ.nextval FROM DUAL
+		</selectKey>
+		INSERT INTO POINT(PT_NO,M_NO,PT_POINT,PT_DATE,PT_USEDPOINT,PT_TYPE,PT_STR)
+		VALUES
+		(#{pt_no},#{m_no},#{pt_point},sysdate,#{pt_usedpoint},#{pt_type},#{pt_str})
+	</insert>
+
+  	<select id="readByNoPoint" resultType="domain.point.Point">
+  		SELECT *
+  		FROM POINT
+  		WHERE PT_NO =#{pt_no}
+  	</select>
+	
+	<select id="readDateFormatter" resultType="java.lang.String">
+		SELECT TO_CHAR(PT_DATE,'yyyy-mm-dd hh24:mi:ss') AS PT_DATE
+  		FROM POINT
+  		WHERE M_NO =#{m_no}
+  		ORDER BY PT_NO DESC
+	</select>
+	
+  	<select id="readByM_noPoint" parameterType="pagebean.ListResultBeanPoint" resultType="domain.point.Point">
+  		<![CDATA[
+	  		select * from 
+	  			(select rownum idx, p.* from  
+	  				(select m_no, pt_usedpoint, pt_type, pt_no, pt_str, pt_point 
+	  				 from point 
+	  				 where m_no=#{m_no} order by pt_no desc
+	  				) p
+	  			) 
+	  		where idx>=#{startRowNum} and idx<=#{endRowNum}
+  		]]>
+  	</select>
+  	
+  	<select id="getPointByM_no" parameterType="int" resultType="domain.point.Point">
+  		select m_no, pt_date, pt_usedpoint, pt_type, pt_no, pt_str, pt_point from point where rownum = 1 and m_no=#{m_no} order by pt_no desc
+  	</select>
+	
+	<select id="readPageCount" parameterType="int" resultType="int">
+		 select count(*) count from point where m_no=#{m_no}
+	</select>
+	
+	<select id="readRecentPoint" resultType="domain.point.Point">
+		select *
+		from point 
+		where pt_date = 
+		(
+			select MAX(pt_date)
+			from point
+			where m_no = #{m_no}
+        )
+	</select>
+ 	
+ 	<select id="readMAXPOINT" resultType="java.lang.Integer">
+ 		select MAX(pt_no)
+		from point 
+		where M_NO =#{m_no}
+ 	</select> 
+ 	
+ 	<delete id="deletePoint" parameterType="java.lang.Integer">
+ 	 	DELETE FROM POINT
+ 	 	WHERE M_NO =#{M_NO}
+ 	 </delete>
+	  
+</mapper>

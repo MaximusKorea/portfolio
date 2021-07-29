@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.schedule.mapper.ScheduleMapper">
+	
+	<resultMap type="domain.schedule.MovieSchedule" id="scheduleResult">
+		<result column="mvs_theater" property="mvs_theater" />
+		<result column="mvs_date" property="mvs_date" />
+		<result column="mvs_time" property="mvs_time" />
+		<result column="mv_no" property="mv_no" />
+	</resultMap>
+
+	<insert id="createSchedule" parameterType="domain.schedule.MovieSchedule">
+		insert into mv_schedule(mvs_theater,mvs_date,mvs_time,mv_no)
+		values
+		(#{mvs_theater},#{mvs_date},#{mvs_time},#{mv_no})
+	</insert>	
+	
+	<update id="updateSchedule" parameterType="domain.schedule.MovieSchedule">
+		update mv_schedule
+		set
+		mvs_theater = #{mvs_theater},
+		mvs_date = #{mvs_date},
+		mvs_time = #{mvs_time},
+		mv_no = #{mv_no},
+		where mvs_theater = #{mvs_theater} 
+		and mvs_date = #{mvs_date}
+		and mvs_time = #{mvs_time}
+		and mv_no = #{mv_no}
+	</update>
+	
+	<delete id="deleteSchedule" parameterType="java.util.Map">
+		delete from mv_schedule
+		where mvs_theater = #{mvs_theater} 
+		and mvs_date = #{mvs_date}
+		and mvs_time = #{mvs_time}
+	</delete>
+
+	<delete id="deleteByNoSchedule" parameterType="java.lang.Integer">
+		delete from mv_schedule
+		where mv_no = #{mv_no} 
+	</delete>
+	
+	<select id="readByNoSchedule" parameterType="java.lang.Integer" resultType="java.util.Map">
+		select mv_name, mv_runtime, mvs_theater, mvs_date, mvs_time 
+		from mv_schedule NATURAL JOIN movie 
+		where mv_no = #{mv_no}
+	</select>
+	
+	<select id="readByNoCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(*) as cnt
+		from mv_schedule
+		where mv_no = #{mv_no}
+		and mvs_date = #{mvs_date}
+	</select>
+	
+	<select id="readByNoCountAll" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(*) as cnt
+		from mv_schedule
+		where mv_no = #{mv_no}
+		and mvs_date >= #{mvs_date}
+	</select>
+	
+	<select id="readByDateSchedule" parameterType="java.lang.String" resultType="java.util.Map">
+		select mv_name, mv_runtime, mvs_theater, mvs_date, mvs_time 
+		from mv_schedule NATURAL JOIN movie 
+		where mvs_date = #{mvs_date}
+	</select>
+	
+	<select id="readSchedule" parameterType="java.util.Map" resultType="domain.schedule.MovieSchedule">
+		select mv_no, mvs_theater, mvs_date, mvs_time
+		from mv_schedule
+		where mv_no = #{mv_no}
+		and mvs_date = #{mvs_date}
+		order by mvs_theater, mvs_time
+	</select>
+
+	<select id="readScheduleWithTheaterDate" parameterType="java.util.Map" resultType="domain.schedule.MovieSchedule">
+		select mv_no, mvs_theater, mvs_date, mvs_time
+		from mv_schedule
+		where mvs_theater = #{mvs_theater}
+		and mvs_date = #{mvs_date}
+		order by mvs_time
+	</select>
+	
+	<select id="readScheduleWithMovieTheaterDate" parameterType="java.util.Map" resultType="domain.schedule.MovieSchedule">
+		select mv_no, mvs_theater, mvs_date, mvs_time
+		from mv_schedule
+		where mvs_theater = #{mvs_theater}
+		and mvs_date = #{mvs_date}
+		and mv_no = #{mv_no}
+		order by mvs_time
+	</select>
+	
+	<select id="readByNoWithDateSchedule" parameterType="java.util.Map" resultMap="scheduleResult">
+		select mv_name, mv_runtime, mvs_theater, mvs_date, mvs_time 
+		from mv_schedule NATURAL JOIN movie 
+		where mv_no = #{mv_no}
+		and mvs_date = #{mvs_date}
+	</select>
+	
+</mapper>

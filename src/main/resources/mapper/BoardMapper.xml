@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="project.board.mapper.BoardMapper">
+
+	<select id="board_readAll" parameterType="pagebean.ListResultBeanType" resultType="domain.board.Board">
+		<![CDATA[   
+		   select * from 
+		      (select rownum idx, b.* from 
+		         (select * 
+		          from board 
+		          where board_type=#{board_type} order by board_groupno desc, board_step asc
+		         ) b
+		      )
+		   where idx>=#{startRowNum} and idx<=#{endRowNum}
+   		]]>
+	</select>
+	
+	<select id="board_readAll_writer" parameterType="pagebean.ListResultBeanTypeWriter" resultType="domain.board.Board">
+		<![CDATA[   
+			select * from 
+	    		(select rownum idx, c.* from 
+	        		(select * from board a 
+	           			 inner join 
+		                	(select board_groupno 
+		               		 from board 
+		                	 where board_type=#{board_type} and board_writer=#{board_writer}
+		                	 ) b 
+		                	 on a.board_groupno = b.board_groupno 
+	        		) c 
+	    		) 
+			where idx>=#{startRowNum} and idx<=#{endRowNum}
+   		]]>
+	</select>
+
+	<select id="board_searchByTitle" parameterType="pagebean.ListResultBeanType" resultType="domain.board.Board">
+		<![CDATA[   
+		   select * from 
+		      (select rownum idx, b.* from 
+		         (select * 
+		          from board 
+		          where board_title like '%'||#{board_title}||'%' and board_type=#{board_type} order by board_groupno desc, board_step asc
+		         ) b
+		      )
+		   where idx>=#{startRowNum} and idx<=#{endRowNum}
+   		]]>
+	</select>
+
+	<select id="board_searchByContent" parameterType="pagebean.ListResultBeanContent" resultType="domain.board.Board">
+		<![CDATA[   
+		   select * from                          
+			    (select rownum idx, c.* from                          
+			        (select * from board a 
+			            inner join 
+			                (select board_groupno 
+			                 from board 
+			                 where board_content like '%'||#{board_content}||'%'
+			                  and board_type=#{board_type}
+			                  and board_writer=#{board_writer}
+			                ) b 
+			            on a.board_groupno = b.board_groupno
+			        ) c
+			    )
+			where idx>=#{startRowNum} and idx<=#{endRowNum}
+   		]]>
+	</select>
+   
+	<select id="board_readBoardType" parameterType="string" resultType="domain.board.Board">
+		select * from board where board_type=#{board_type} order by board_regDate desc
+	</select>   
+   
+	<select id="readCountByType" parameterType="string" resultType="int">
+		select count(*) count from board where board_type=#{board_type}
+	</select>   
+	
+	<select id="board_searchCountByTitle" parameterType="string" resultType="int">
+		select count(*) count from board where board_title like '%'||#{board_title}||'%'
+	</select>
+	
+	<select id="board_searchCountByContent" parameterType="pagebean.ListPageConfigBeanContent" resultType="int">
+		select count(*) count from board where board_content like '%'||#{board_content}||'%' and board_type = #{board_type} and board_writer = #{board_writer}
+	</select>
+	
+	<select id="readCountByWriter" parameterType="string" resultType="int">
+		select count(*) count from board a
+			inner join 
+				(select board_groupno 
+				from board 
+				where board_writer=#{board_writer}) b
+		on a.board_groupno = b.board_groupno
+	</select>  
+	
+	<select id="read_groupno" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT BOARD_GROUPNO FROM BOARD WHERE BOARD_NO = #{no}
+	</select>
+	
+	<insert id="reply_createBoard" parameterType="domain.board.Board">
+		<selectKey keyProperty="board_no" resultType="java.lang.Integer" order="BEFORE"> 
+			select board_no_seq.nextval from dual
+		</selectKey>
+		INSERT INTO BOARD(BOARD_NO,
+						  BOARD_TITLE,
+						  BOARD_WRITER,
+						  BOARD_CONTENT,
+						  BOARD_REGDATE,
+						  BOARD_TYPE,
+						  BOARD_IMAGE,
+						  READCOUNT,
+						  BOARD_GROUPNO,
+						  BOARD_STEP,
+						  BOARD_DEPTH) 
+		VALUES(#{board_no},
+			   #{board_title},
+			   #{board_writer},
+			   #{board_content},
+			   SYSDATE,
+			   #{board_type},
+			   #{board_image},
+			   0,
+			   #{board_groupno},
+			   #{board_step},
+			   #{board_depth})
+	</insert>
+
+	<insert id="createBoard" parameterType="domain.board.Board">
+		<selectKey keyProperty="board_no" resultType="int" order="BEFORE">
+			select board_no_seq.nextval from dual
+		</selectKey>
+		INSERT INTO BOARD(BOARD_NO,
+						  BOARD_TITLE,
+						  BOARD_WRITER,
+						  BOARD_CONTENT,
+						  BOARD_REGDATE,
+						  BOARD_TYPE,
+						  BOARD_IMAGE,
+						  READCOUNT,
+						  BOARD_GROUPNO,
+						  BOARD_STEP,
+						  BOARD_DEPTH) 
+		VALUES(#{board_no},
+			   #{board_title},
+			   #{board_writer},
+			   #{board_content},
+			   SYSDATE,
+			   #{board_type},
+			   #{board_image},
+			   #{readCount},
+			   #{board_no},
+			   1,
+			   0)
+	</insert>
+	
+	<select id='readByNoBoard' parameterType="java.lang.Integer" resultType="domain.board.Board">
+		SELECT BOARD_NO,
+			   BOARD_TITLE,
+			   BOARD_WRITER,
+			   BOARD_CONTENT,
+			   BOARD_REGDATE,
+			   BOARD_TYPE,
+		   	   BOARD_IMAGE,
+		   	   READCOUNT,
+			   BOARD_GROUPNO,
+			   BOARD_STEP,
+			   BOARD_DEPTH 
+		FROM BOARD 
+		WHERE BOARD_NO = #{board_no}
+	</select>
+	
+	<update id="updateBoard" parameterType="domain.board.Board">
+		UPDATE BOARD 
+		SET BOARD_TITLE = #{board_title}, 
+			BOARD_CONTENT = #{board_content}, 
+			BOARD_TYPE = #{board_type},
+			BOARD_IMAGE = #{board_image} 
+		WHERE BOARD_NO = #{board_no}
+	</update>
+		
+	<delete id="deleteBoard" parameterType="java.lang.Integer">
+		DELETE FROM BOARD 
+		WHERE BOARD_NO = #{board_no}
+	</delete>	
+	
+	<update id="reply_board_stepAdd" parameterType="domain.board.Board">
+		UPDATE BOARD SET BOARD_STEP = BOARD_STEP + 1 
+		WHERE BOARD_STEP > #{board_step} AND BOARD_GROUPNO = #{board_groupno}
+	</update>
+	
+	<update id="updateReadCount" parameterType="domain.board.Board">
+		UPDATE BOARD 
+		SET READCOUNT = READCOUNT + 1 
+		WHERE BOARD_NO = #{board_no}
+	</update>
+	
+</mapper>

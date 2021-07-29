@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<import resource="datasource-config.xml" />
+	
+	<!-- SqlSessionFactoryBean[MyBatis] -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="apacheDataSource" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:mapper/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- SqlSessionTemplate[MyBatis] -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- Dao -->
+	<bean id="memberDao" class="dao.member.MemberDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="productDao" class="dao.product.ProductDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="productOrderDao" class="dao.product.ProductOrderDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="reviewDao" class="dao.review.ReviewDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="reservationDao" class="dao.reservation.ReservationDAOImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="movieDao" class="dao.movie.MovieDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="boardDao" class="dao.board.BoardDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="movieScheduleDao" class="dao.schedule.MovieScheduleDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>
+	<bean id="pointDao" class="dao.point.PointDaoImpl">
+		<property name="sqlSession" ref="sqlSession"></property>
+	</bean>	
+		
+
+	<!-- Service -->
+	<bean id="memberService" class="service.member.MemberServiceImpl">
+		<property name="memberdao" ref="memberDao"></property>
+	</bean>
+	<bean id="reviewService" class="service.review.ReviewServiceImpl">
+		<property name="reviewDao" ref="reviewDao"></property>
+	</bean>
+	<bean id="reservationService" class="service.reservation.ReservationServiceImpl">
+		<property name="reservationDAO" ref="reservationDao"></property>
+	</bean>
+	<bean id="movieService" class="service.movie.MovieServiceImpl">
+		<property name="movieDao" ref="movieDao"></property>
+	</bean>
+	<bean id="boardService" class="service.board.BoardServiceImpl">
+		<property name="boardDao" ref="boardDao"></property>
+	</bean>
+	<bean id="productService" class="service.product.ProductServiceImpl">
+		<property name="productDao" ref="productDao"></property>
+	</bean>
+	<bean id="productOrderService" class="service.product.ProductOrderServiceImpl">
+		<property name="productOrderDao" ref="productOrderDao"></property>
+	</bean>
+	<bean id="movieScheduleService" class="service.schedule.MovieScheduleServiceImpl">
+		<property name="movieScheduleDao" ref="movieScheduleDao"></property>
+	</bean>
+	<bean id="pointService" class="service.point.PointServiceImpl">
+		<property name="pointDao" ref="pointDao"></property>
+	</bean>
+
+	<!-- mail -->
+	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl" id="mailSender">
+		<property value="smtp.gmail.com" name="host" />
+		<property value="587" name="port" />
+		<property value="a01031266033@gmail.com" name="username" />	<!-- value = 보내는 email 주소 -->
+		<property value="wh1002023" name="password" />				<!-- value = 보내는 email 비번 -->
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.debug">true</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>
