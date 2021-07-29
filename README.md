@@ -69,7 +69,7 @@ CGV 영화예매사이트 포트폴리오
 
 -로그인-
 
-![image](https://user-images.githubusercontent.com/78652436/127482024-aea7c39d-8af3-4c0d-a10c-e4d72e6059bb.png)
+![image](https://user-images.githubusercontent.com/78652436/127484022-df98023e-6c4d-42c0-9bcc-bb6941ec7365.png)
 
 
 1. 로그인 필수 입력 체크
@@ -89,6 +89,7 @@ CGV 영화예매사이트 포트폴리오
 -아이디 찾기-
 
 ![image](https://user-images.githubusercontent.com/78652436/127480816-aec3b83b-6f50-4c54-b8e5-e0981a815b08.png)
+
 
 1. 필수 입력 필드 체크
 2. 아이디 찾기 시 팝업 호출
